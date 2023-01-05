@@ -64,6 +64,7 @@ const antilink = JSON.parse(fs.readFileSync('./database/antilink.json'));
 const mute = JSON.parse(fs.readFileSync('./database/antilink.json'));
 const database = require('./database/database.json')
 const stcCmd = JSON.parse(fs.readFileSync('./database/command.json'))
+const ikhsanowner = JSON.parse(fs.readFileSync('./database/ikhsanhost.json'))
 const db_respon_list = JSON.parse(fs.readFileSync('./database/list-message.json'));
 const { sendButLoc, sendButDoC, sendButDoc, sendListMenu, sendListAge, sendListGender, sendListLang, sendButImage, sendKatalog, sendKatalog2, sendContact } = require ('./lib/welcome')
 
@@ -88,6 +89,16 @@ const tebakkimia = {}
 const tebaklirik = {}
 const tebaktebakan = {}
 
+//Whm Setting
+let hostwhm = "dash.meixgan.codes" //Host server whm contoh : login.ditzzsenpai.wtf
+let usrwhm = "ikhsanstore" //username whm
+let passwhm = "@#Donasi@@" //Password whm
+let tokenwhm = "EJOCSZA7DIHK3J80DO1U1CYEJGA2XHJA" // caranya => https://www.eukhost.com/kb/how-to-generate-an-api-token-using-whm/
+let ipsrv = "159.223.198.4" //ip server whm
+
+//Biarin Jgn Di ubah
+let authWhm = {headers: {Authorization: `WHM ${usrwhm}:${tokenwhm}`}}
+
 
 module.exports = alpha = async (alpha, m, chatUpdate, store, reSize) => {
     try {
@@ -105,6 +116,7 @@ module.exports = alpha = async (alpha, m, chatUpdate, store, reSize) => {
         const pushname = m.pushName || "No Name"
         const sender = m.isGroup ? (mek.key.participant ? mek.key.participant : mek.participant) : mek.key.remoteJid
         const isCreator = [alpha.user.id, ...global.owner].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
+        const itsMeIkhsan = [alpha.user.id, ...ikhsanowner].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
         const itsMe = m.sender == alpha.user.id ? true : false
         const text = q = args.join(" ")
         const c = args.join(' ')
@@ -4954,6 +4966,560 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                 db.data.users[m.sender].limit -= 1
             }
             break
+
+case 'createakun':
+if (m.isGroup) return reply(mess.private)
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+let domain = q.split('|')[0]
+let usern = q.split('|')[2]
+let pekeg = q.split('|')[1]
+if (args.length < 1) return reply(`Kirim perintah ${command} domain|package|username`)
+reply("Sedang MemBuat Akun.... Tunggu 2 Menit")
+
+axios.get(`https://${hostwhm}:2087/json-api/createacct?api.version=1&username=${usern}&contactemail=ikhsanainul5@gmail.com&plan=${pekeg}&domain=${domain}`, authWhm)
+.then(response => {     
+     let np = response.data
+          if (np.metadata.result == 0) {
+           reply(np.metadata.reason)
+          } else {
+           let dsta = np.metadata.output.raw;
+            var substr = dsta.substring(
+              dsta.toString().indexOf("+===================================+")
+            ); //substr = 'word. Hello!'
+            let nefft = substr.split("| Language: en")[0];
+            reply(`${nefft}\n\nLogin Whm : https://${hostwhm}:2087\nLogin cPanel : https://${hostwhm}:2083`)
+  }});
+		    break
+
+case 'carabuatbot':
+case 'carajadibot':
+reply(`Tutor Buat Bot Wa Di Termux
+Bahan:
+2 HP
+Termux
+Sc Bot
+Data Yang Banyak
+Niat
+
+Cara Buat
+$ pkg update
+$ pkg upgrade
+$ pkg install nodejs
+$ pkg install nodejs-lts
+$ pkg install ffmpeg
+$ pkg install imagemagick
+$ pkg install webp
+$ cd <Lokasi Scnya>
+$ cp -r <nama Folder Scnya> $HOME
+$ cd
+$ cd <NamaFolderScnya>
+$ npm install
+$ npm start
+
+Jika Sudah Muncul QR Nya Scan Pakai Wa Yang Mau Lu Jadikan Bot
+
+Cara Scan
+1.Tekan Titik 3 Di Kanan Atas
+2.Tekan Perangkat Tertaut
+3.Ketik Ok
+4.Lalu Scan`)
+break
+
+case 'listakun':
+if (m.isGroup) return reply(mess.private)
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+reply('Sedang Mendapatkan Info Akun')
+axios.get(`https://${hostwhm}:2087/json-api/listaccts?api.version=1`, authWhm)
+.then((risol) => {
+let lisol = risol.data
+var ttdy = lisol.data.acct
+let ogh = `*── 「 LIST AKUN 」 ──*\nTotal Akun : ${ttdy.length}\n`
+for (let i = 0; i < ttdy.length; i++) {
+ogh += `
+\n
+─────[\`\`\` ${ttdy[i].user} \`\`\` ]────────
+*▢ Maxsub* : ${ttdy[i].maxsub}
+*▢ Maxsql* : ${ttdy[i].maxsql}
+*▢ Startdate* : ${ttdy[i].startdate}
+*▢ Disklimit* : ${ttdy[i].disklimit}
+*▢ Maxlst* : ${ttdy[i].maxlst}
+*▢ Plan* : ${ttdy[i].plan}
+*▢ Owner*: ${ttdy[i].owner}
+*▢ IP* : ${ttdy[i].ip}
+*▢ Domain* : ${ttdy[i].domain}
+*▢ Diskused* : ${ttdy[i].diskused}
+*▢ Maxaddons* : ${ttdy[i].maxaddons}
+*▢ Suspendreason* : ${ttdy[i].suspendreason}
+─────────────────\n\n`
+}
+reply(ogh)
+})
+break
+
+case 'killakun':
+if (m.isGroup) return reply(mess.private)
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+if (args.length < 2) return reply(`Kirim perintah ${command} username`)
+reply('Wait Terminating Account....')
+axios
+    .get(
+      `https://${hostwhm}:2087/json-api/removeacct?api.version=1&username=${args[1]}`, authWhm )
+    .then((e) => {
+      if ([1, "1"].includes(e.data?.metadata?.result))
+      reply(`Done User ${args[1]} Telah di Terminate`);
+      else {
+        reply(e.metadata);
+        console.log(e.data);
+      }
+    })
+break
+
+case 'listpack':
+reply(`List Package:
+• cPanel Mini
+• cPanel Medium
+• cPanel Extra
+• cPanel Super
+
+• Whm Mini
+• Whm Medium
+• Whm Extra
+• Whm Super
+
+• Mwhm Mini
+• Mwhm Medium
+• Mwhm Extra
+• Mwhm Super
+
+• Admin
+• Ceo
+• Wakil Founder
+
+Contoh Penggunaan:
+.createakun domainnya|Package|Username`)
+break
+
+case 'infoserver':
+if (m.isGroup) return reply(mess.private)
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+reply(`=======Info Server=========
+
+Server : ${hostwhm}
+Username : ${usrwhm}
+Password : ${passwhm}
+IP : ${ipsrv}
+
+=========================
+`)
+break
+
+case 'promosiall':
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+reply(`Bismillah
+
+Ready All Keb Host, Sc Keperluan Server Dan Bot
+*========Kebutuhan Host=======*
+• cPanel Mini - cPanel Super
+• Whm Mini - Whm Super
+• Mwhm Mini - Mwhm Super
+• Admin Host
+• Ceo
+*=========Sc Kebutuhan Server======*
+• Sc Addpackage
+• Sc Shortlink
+*============MurBug==============*
+• Ready Wa Gb Kebal
+• Open MurBug 5K
+*==============Bot===============*
+• Sewa Bot Ke Grup
+ *Fitur Khusus*
+• Antilink
+• Welcome
+• Group Open/Close Time
+• Kick
+• Add(Belum Stabil)
+• Promote
+• Demote
+• DLL
+
+*Premium*
+Keuntungan
+• Bisa Akses Semua Fitur Premium Bot
+• Bisa Add Bot Ke Grup Selama 7Hari
+*======================*
+
+Minat/Harga? Pm
+
+Bot Create Subdomain *Free*
+↓↓↓↓
+wa.me/6283137750223
+
+Ketik .listdomain Untuk Menampilkan Subdomain Yang Tersedia
+
+*Via Link* : http://subdomainikhsan.biz.id/
+
+*Group Bot*: https://chat.whatsapp.com/GpwaG5nvU2yCitgJ7c8o8f
+
+*Jangan Spam*
+
+*Kagak Boleh JB/Promosi/ShareLink Di Grup Ini?* Kick Aja`)
+break
+
+case 'promosisewabot':
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+reply(`Open *Sewa Bot KeGrup*
+
+Keunggulan
+• *Antilink* (Kick Otomatis Jika Ada Yang Share Link Grup)
+• *Welcome* (Menyambut Member Baru Jika Ada Yang Join)
+• *Kick* (Ngekick Orang Yang Melanggar Peraturan Dan Nggak Bisa Join Lagi)
+• *Upgrade Premium* (Bisa Mengakses Semua Fitur Premium Yang Lebih Bagus Daripada Fitur Free User)
+
+*Minat*?Pm Harga 10K/Perbulan
+wa.me/6285756448056`)
+break
+case 'promosipremium':
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+reply(`*Premium*
+Keuntungan
+• Bisa Akses Semua Fitur Premium Bot
+• Bisa Add Bot Ke Grup Selama 7Hari`)
+break
+
+case 'promosimurbug':
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+reply(`Join MurBug? Harga 6K
+
+Keuntungannya
+
+• Bisa Akses Semua Fitur Bug
+• Bisa Spam Ripper Sampai Mampus/ Limit 25/Santet
+• Dari Semua Fitur Yang Diatas Yang Paling Ampuh Adalah Fitur .spambugvip
+
+Minat?Pm Saya`)
+break
+
+case 'webp1':
+case 'webp2':
+case 'webp3':
+case 'webp4':
+case 'webp5':
+case 'webp6':
+case 'webp7':
+case 'webp8':
+case 'webp9':
+case 'webp10':
+reply(`Fitur Webp Belum Ada, Donasi Atau SewaBot Kalo Mau Fitur Ini Ada, Mau Donasi Atau Sewa Bot? Pm wa.me/6285756448056`)
+break
+
+case 'listdomain':
+reply(`SELAMAT MENIKMATI DOMAIN YANG ADA 🤗
+
+┏━┅┅►❝𝐃𝐀𝐅𝐓𝐀𝐑 𝐃𝐎𝐌𝐀𝐈𝐍❞◄━┅┅┓
+┃ 
+┃┊◎ .domain1 | xcoehx.my.id ✅
+┃
+┃┊◎ .domain2 | nagz.my.id✅
+┃
+┃┊◎ .domain3 | efbeca.my.id✅
+┃
+┃┊◎ .domain4 | dahget.my.id✅
+┃
+┃┊◎ .domain5 | viralpinks.my.id ✅
+┃
+┃┊◎ .domain6 | bri3.my.id ✅
+┃
+┗━❁━┈━❁━┈━❁━┈━❁━┛
+
+contoh : .domain1 namahost|ip server`)
+break
+
+case 'domain1': {
+if (m.isGroup) return reply(mess.private)
+        function subDomain1(host, ip) {
+          return new Promise((resolve) => {
+            let zone1 = "e33965d2c50f0f3b4d01137c6875c43b";
+            let apiToken1 = "-6ffPnXT1fxf-UTA7LjsR-H9c2hMqRfuHLQ7v8cp";
+            let tld1 = "xcoehx.my.id";
+            axios
+              .post(
+                `https://api.cloudflare.com/client/v4/zones/${zone1}/dns_records`,
+                { type: "A", name: host.replace(/[^a-z0-9.-]/gi, "") + "." + tld1, content: ip.replace(/[^0-9.]/gi, ""), ttl: 3600, priority: 10, proxied: false },
+                {
+                  headers: {
+                    Authorization: "Bearer " + apiToken1,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((e) => {
+                let res = e.data;
+                if (res.success) resolve({ success: true, zone: res.result?.zone_name, name: res.result?.name, ip: res.result?.content });
+              })
+              .catch((e) => {
+                let err1 = e.response?.data?.errors?.[0]?.message || e.response?.data?.errors || e.response?.data || e.response || e;
+                let err1Str = String(err1);
+                resolve({ success: false, error: err1Str });
+              });
+          });
+        }
+
+        let raw1 = args?.join(" ")?.trim();
+        if (!raw1) return m.reply("Mana Host & IP Nya Bang?");
+        let host1 = raw1
+          .split("|")[0]
+          .trim()
+          .replace(/[^a-z0-9.-]/gi, "");
+        if (!host1) return m.reply("host tidak valid, pastikan host hanya mengandung huruf, angka, - (strip), dan . (titik)");
+        let ip1 = raw1.split("|")[1]?.replace(/[^0-9.]/gi, "");
+        if (!ip1 || ip1.split(".").length < 4) return m.reply(ip1 ? "ip tidak valid" : "mana ip nya");
+
+        subDomain1(host1, ip1).then((e) => {
+          if (e['success']) m.reply(`𝙱𝙴𝚁𝙷𝙰𝚂𝙸𝙻 𝙼𝙴𝙽𝙰𝙼𝙱𝙰𝙷𝙼𝙰𝙽 𝚂𝚄𝙱𝙳𝙾𝙼𝙰𝙸𝙽\n𝙸𝙿 : ${e['ip']}\n𝙳𝙾𝙼𝙰𝙸𝙽 𝙽𝚈𝙰 𝚈𝙰 𝚂𝙰𝚃: ${e['name']}\n\nTELAH TERDAFTAR`);
+          else m.reply(`𝙶𝙰𝙶𝙰𝙻 ? 𝙹𝙻𝚂 𝙻𝚄 𝙶𝙰𝙺 𝙶𝙰𝙽𝚃𝙴𝙽𝙶\nMsg: ${e['error']}`)
+        });
+        }
+        break
+
+        case 'domain2':
+        if (m.isGroup) return reply(mess.private)
+        function subDomain2(host, ip) {
+          return new Promise((resolve2) => {
+            let zone2 = "24aab0efa61b73ddf37f6beeeba2c391";
+            let apiToken2 = "-6ffPnXT1fxf-UTA7LjsR-H9c2hMqRfuHLQ7v8cp";
+            let tld2 = "nagz.my.id";
+            axios
+              .post(
+                `https://api.cloudflare.com/client/v4/zones/${zone2}/dns_records`,
+                { type: "A", name: host.replace(/[^a-z0-9.-]/gi, "") + "." + tld2, content: ip.replace(/[^0-9.]/gi, ""), ttl: 3600, priority: 10, proxied: false },
+                {
+                  headers: {
+                    Authorization: "Bearer " + apiToken2,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((e) => {
+                let res = e.data;
+                if (res.success) resolve2({ success: true, zone: res.result?.zone_name, name: res.result?.name, ip: res.result?.content });
+              })
+              .catch((e) => {
+                let err2 = e.response?.data?.errors?.[0]?.message || e.response?.data?.errors || e.response?.data || e.response || e;
+                let err2Str = String(err2);
+                resolve2({ success: false, error: err2Str });
+              });
+          });
+        }
+
+        let raw2 = args?.join(" ")?.trim();
+        if (!raw2) return m.reply("Mana Host & IP Nya Bang?");
+        let host2 = raw2
+          .split("|")[0]
+          .trim()
+          .replace(/[^a-z0-9.-]/gi, "");
+        if (!host2) return m.reply("host tidak valid, pastikan host hanya mengandung huruf, angka, - (strip), dan . (titik)");
+        let ip2 = raw2.split("|")[1]?.replace(/[^0-9.]/gi, "");
+        if (!ip2 || ip2.split(".").length < 4) return m.reply(ip2 ? "ip tidak valid" : "mana ip nya");
+
+        subDomain2(host2, ip2).then((e) => {
+          if (e['success']) m.reply(`𝙱𝙴𝚁𝙷𝙰𝚂𝙸𝙻 𝙼𝙴𝙽𝙰𝙼𝙱𝙰𝙷𝙼𝙰𝙽 𝚂𝚄𝙱𝙳𝙾𝙼𝙰𝙸𝙽\n𝙸𝙿 : ${e['ip']}\n𝙳𝙾𝙼𝙰𝙸𝙽 𝙽𝚈𝙰 𝚈𝙰 𝚂𝙰𝚃: ${e['name']}\n\nTELAH TERDAFTAR`);
+          else m.reply(`𝙶𝙰𝙶𝙰𝙻 ? 𝙹𝙻𝚂 𝙻𝚄 𝙶𝙰𝙺 𝙶𝙰𝙽𝚃𝙴𝙽𝙶\nMsg: ${e['error']}`)
+        });
+        break
+
+            case 'domain3':
+            if (m.isGroup) return reply(mess.private)
+        function subDomain3(host, ip) {
+          return new Promise((resolve3) => {
+            let zone3 = "e168b11fd245dc64a08614062ccfbfac";
+            let apiToken3 = "-6ffPnXT1fxf-UTA7LjsR-H9c2hMqRfuHLQ7v8cp";
+            let tld3 = "efbeca.my.id";
+            axios
+              .post(
+                `https://api.cloudflare.com/client/v4/zones/${zone3}/dns_records`,
+                { type: "A", name: host.replace(/[^a-z0-9.-]/gi, "") + "." + tld3, content: ip.replace(/[^0-9.]/gi, ""), ttl: 3600, priority: 10, proxied: false },
+                {
+                  headers: {
+                    Authorization: "Bearer " + apiToken3,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((e) => {
+                let res = e.data;
+                if (res.success) resolve3({ success: true, zone: res.result?.zone_name, name: res.result?.name, ip: res.result?.content });
+              })
+              .catch((e) => {
+                let err3 = e.response?.data?.errors?.[0]?.message || e.response?.data?.errors || e.response?.data || e.response || e;
+                let err3Str = String(err3);
+                resolve3({ success: false, error: err3Str });
+              });
+          });
+        }
+
+        let raw3 = args?.join(" ")?.trim();
+        if (!raw3) return m.reply("Mana Host & IP Nya Bang?");
+        let host3 = raw3
+          .split("|")[0]
+          .trim()
+          .replace(/[^a-z0-9.-]/gi, "");
+        if (!host3) return m.reply("host tidak valid, pastikan host hanya mengandung huruf, angka, - (strip), dan . (titik)");
+        let ip3 = raw3.split("|")[1]?.replace(/[^0-9.]/gi, "");
+        if (!ip3 || ip3.split(".").length < 4) return m.reply(ip3 ? "ip tidak valid" : "mana ip nya");
+
+        subDomain3(host3, ip3).then((e) => {
+          if (e['success']) m.reply(`𝙱𝙴𝚁𝙷𝙰𝚂𝙸𝙻 𝙼𝙴𝙽𝙰𝙼𝙱𝙰𝙷𝙼𝙰𝙽 𝚂𝚄𝙱𝙳𝙾𝙼𝙰𝙸𝙽\n𝙸𝙿 : ${e['ip']}\n𝙳𝙾𝙼𝙰𝙸𝙽 𝙽𝚈𝙰 𝚈𝙰 𝚂𝙰𝚃: ${e['name']}\n\nTELAH TERDAFTAR`);
+          else m.reply(`𝙶𝙰𝙶𝙰𝙻 ? 𝙹𝙻𝚂 𝙻𝚄 𝙶𝙰𝙺 𝙶𝙰𝙽𝚃𝙴𝙽𝙶\nMsg: ${e['error']}`)
+        });
+        break
+
+case 'domain4':
+if (m.isGroup) return reply(mess.private)
+        function subDomain4(host, ip) {
+          return new Promise((resolve4) => {
+            let zone4 = "7575c6753060163b9f3c14b5f4697892";
+            let apiToken4 = "-6ffPnXT1fxf-UTA7LjsR-H9c2hMqRfuHLQ7v8cp";
+            let tld4 = "dahget.my.id";
+            axios
+              .post(
+                `https://api.cloudflare.com/client/v4/zones/${zone4}/dns_records`,
+                { type: "A", name: host.replace(/[^a-z0-9.-]/gi, "") + "." + tld4, content: ip.replace(/[^0-9.]/gi, ""), ttl: 4600, priority: 10, proxied: false },
+                {
+                  headers: {
+                    Authorization: "Bearer " + apiToken4,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((e) => {
+                let res = e.data;
+                if (res.success) resolve4({ success: true, zone: res.result?.zone_name, name: res.result?.name, ip: res.result?.content });
+              })
+              .catch((e) => {
+                let err4 = e.response?.data?.errors?.[0]?.message || e.response?.data?.errors || e.response?.data || e.response || e;
+                let err4Str = String(err4);
+                resolve4({ success: false, error: err4Str });
+              });
+          });
+        }
+
+        let raw4 = args?.join(" ")?.trim();
+        if (!raw4) return m.reply("Mana Host & IP Nya Bang?");
+        let host4 = raw4
+          .split("|")[0]
+          .trim()
+          .replace(/[^a-z0-9.-]/gi, "");
+        if (!host4) return m.reply("host tidak valid, pastikan host hanya mengandung huruf, angka, - (strip), dan . (titik)");
+        let ip4 = raw4.split("|")[1]?.replace(/[^0-9.]/gi, "");
+        if (!ip4 || ip4.split(".").length < 4) return m.reply(ip4 ? "ip tidak valid" : "mana ip nya");
+
+        subDomain4(host4, ip4).then((e) => {
+          if (e['success']) m.reply(`𝙱𝙴𝚁𝙷𝙰𝚂𝙸𝙻 𝙼𝙴𝙽𝙰𝙼𝙱𝙰𝙷𝙼𝙰𝙽 𝚂𝚄𝙱𝙳𝙾𝙼𝙰𝙸𝙽\n𝙸𝙿 : ${e['ip']}\n𝙳𝙾𝙼𝙰𝙸𝙽 𝙽𝚈𝙰 𝚈𝙰 𝚂𝙰𝚃: ${e['name']}\n\nTELAH TERDAFTAR`);
+          else m.reply(`𝙶𝙰𝙶𝙰𝙻 ? 𝙹𝙻𝚂 𝙻𝚄 𝙶𝙰𝙺 𝙶𝙰𝙽𝚃𝙴𝙽𝙶\nMsg: ${e['error']}`)
+        });
+        break
+
+case 'domain5':
+if (m.isGroup) return reply(mess.private)
+        function subDomain5(host, ip) {
+          return new Promise((resolve5) => {
+            let zone5 = "653315c4b546abd9367effdd75d4f9c2";
+            let apiToken5 = "-6ffPnXT1fxf-UTA7LjsR-H9c2hMqRfuHLQ7v8cp";
+            let tld5 = "viralpinks.my.id";
+            axios
+              .post(
+                `https://api.cloudflare.com/client/v4/zones/${zone5}/dns_records`,
+                { type: "A", name: host.replace(/[^a-z0-9.-]/gi, "") + "." + tld5, content: ip.replace(/[^0-9.]/gi, ""), ttl: 4600, priority: 10, proxied: false },
+                {
+                  headers: {
+                    Authorization: "Bearer " + apiToken5,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((e) => {
+                let res = e.data;
+                if (res.success) resolve5({ success: true, zone: res.result?.zone_name, name: res.result?.name, ip: res.result?.content });
+              })
+              .catch((e) => {
+                let err5 = e.response?.data?.errors?.[0]?.message || e.response?.data?.errors || e.response?.data || e.response || e;
+                let err5Str = String(err5);
+                resolve5({ success: false, error: err5Str });
+              });
+          });
+        }
+
+        let raw5 = args?.join(" ")?.trim();
+        if (!raw5) return m.reply("Mana Host & IP Nya Bang?");
+        let host5 = raw5
+          .split("|")[0]
+          .trim()
+          .replace(/[^a-z0-9.-]/gi, "");
+        if (!host5) return m.reply("host tidak valid, pastikan host hanya mengandung huruf, angka, - (strip), dan . (titik)");
+        let ip5 = raw5.split("|")[1]?.replace(/[^0-9.]/gi, "");
+        if (!ip5 || ip5.split(".").length < 4) return m.reply(ip5 ? "ip tidak valid" : "mana ip nya");
+
+        subDomain5(host5, ip5).then((e) => {
+          if (e['success']) m.reply(`𝙱𝙴𝚁𝙷𝙰𝚂𝙸𝙻 𝙼𝙴𝙽𝙰𝙼𝙱𝙰𝙷𝙼𝙰𝙽 𝚂𝚄𝙱𝙳𝙾𝙼𝙰𝙸𝙽\n𝙸𝙿 : ${e['ip']}\n𝙳𝙾𝙼𝙰𝙸𝙽 𝙽𝚈𝙰 𝚈𝙰 𝚂𝙰𝚃: ${e['name']}\n\nTELAH TERDAFTAR`);
+          else m.reply(`𝙶𝙰𝙶𝙰𝙻 ? 𝙹𝙻𝚂 𝙻𝚄 𝙶𝙰𝙺 𝙶𝙰𝙽𝚃𝙴𝙽𝙶\nMsg: ${e['error']}`)
+        });
+        break
+
+case 'domain6':
+if (m.isGroup) return reply(mess.private)
+        function subDomain6(host, ip) {
+          return new Promise((resolve6) => {
+            let zone6 = "fc81a394040c6f65f8e3db0b381f6a28";
+            let apiToken6 = "-6ffPnXT1fxf-UTA7LjsR-H9c2hMqRfuHLQ7v8cp";
+            let tld6 = "bri3.my.id";
+            axios
+              .post(
+                `https://api.cloudflare.com/client/v4/zones/${zone6}/dns_records`,
+                { type: "A", name: host.replace(/[^a-z0-9.-]/gi, "") + "." + tld6, content: ip.replace(/[^0-9.]/gi, ""), ttl: 4600, priority: 10, proxied: false },
+                {
+                  headers: {
+                    Authorization: "Bearer " + apiToken6,
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((e) => {
+                let res = e.data;
+                if (res.success) resolve6({ success: true, zone: res.result?.zone_name, name: res.result?.name, ip: res.result?.content });
+              })
+              .catch((e) => {
+                let err6 = e.response?.data?.errors?.[0]?.message || e.response?.data?.errors || e.response?.data || e.response || e;
+                let err6Str = String(err6);
+                resolve6({ success: false, error: err6Str });
+              });
+          });
+        }
+
+        let raw6 = args?.join(" ")?.trim();
+        if (!raw6) return m.reply("Mana Host & IP Nya Bang?");
+        let host6 = raw6
+          .split("|")[0]
+          .trim()
+          .replace(/[^a-z0-9.-]/gi, "");
+        if (!host6) return m.reply("host tidak valid, pastikan host hanya mengandung huruf, angka, - (strip), dan . (titik)");
+        let ip6 = raw6.split("|")[1]?.replace(/[^0-9.]/gi, "");
+        if (!ip6 || ip6.split(".").length < 4) return m.reply(ip6 ? "ip tidak valid" : "mana ip nya");
+
+        subDomain6(host6, ip6).then((e) => {
+          if (e['success']) m.reply(`𝙱𝙴𝚁𝙷𝙰𝚂𝙸𝙻 𝙼𝙴𝙽𝙰𝙼𝙱𝙰𝙷𝙼𝙰𝙽 𝚂𝚄𝙱𝙳𝙾𝙼𝙰𝙸𝙽\n𝙸𝙿 : ${e['ip']}\n𝙳𝙾𝙼𝙰𝙸𝙽 𝙽𝚈𝙰 𝚈𝙰 𝚂𝙰𝚃: ${e['name']}\n\nTELAH TERDAFTAR`);
+          else m.reply(`𝙶𝙰𝙶𝙰𝙻 ? 𝙹𝙻𝚂 𝙻𝚄 𝙶𝙰𝙺 𝙶𝙰𝙽𝚃𝙴𝙽𝙶\nMsg: ${e['error']}`)
+        });
+        break
+
+case 'idgrup':
+if (!itsMeIkhsan) return reply(mess.ikhsan)
+if (!m.isGroup) return reply(mess.group)
+if (!isBotGroupAdmins) return reply(lang.botNotAdm())
+reply(`Info Group
+Nama      : ${groupMetadata.subject}
+ID          : ${groupMetadata.id}`)
+break
+
             case 'dragonballfb': {
                 if (db.data.settings[botNumber].userRegister && !db.data.users[m.sender].registered) return alpha.send2ButMes(m.chat, `🇮🇩 _Hi @${m.sender.split('@')[0]} silahkan verifikasi terlebih dahulu sebelum memakai fitur bot_${enter}${enter}🇺🇸 _Hi @${m.sender.split('@')[0]} please verify first before using the bot feature_`, `© ${ownername}`, `.daftar ` + pushname, `🇺🇸 Verify`, `.daftar ` + pushname, 'Daftar 🇮🇩', fkontak, [m.sender])
                 if (db.data.users[m.sender].limit < 1) return alpha.send2ButMes(m.chat, lang.Nolimit(prefix), `© ${ownername}`, `.daily`, `👉 Daily`, `.weekly`, `Weekly 👈`, m)
@@ -7121,6 +7687,12 @@ ${prefix}nuliskiri Subscribe Ya https://youtube.com/c/zeeoneofc`)
                 db.data.users[m.sender].limit -= 1
             }
             break
+
+case 'menuweb':
+case 'menuwebp':
+reply(`Mau Apa Bang? Fitur Webp Belum Ada`)
+break
+
             case 'nuliskanan': {
                 if (db.data.settings[botNumber].userRegister && !db.data.users[m.sender].registered) return alpha.send2ButMes(m.chat, `🇮🇩 _Hi @${m.sender.split('@')[0]} silahkan verifikasi terlebih dahulu sebelum memakai fitur bot_${enter}${enter}🇺🇸 _Hi @${m.sender.split('@')[0]} please verify first before using the bot feature_`, `© ${ownername}`, `.daftar ` + pushname, `🇺🇸 Verify`, `.daftar ` + pushname, 'Daftar 🇮🇩', fkontak, [m.sender])
                 if (db.data.users[m.sender].limit < 1) return alpha.send2ButMes(m.chat, lang.Nolimit(prefix), `© ${ownername}`, `.daily`, `👉 Daily`, `.weekly`, `Weekly 👈`, m)
